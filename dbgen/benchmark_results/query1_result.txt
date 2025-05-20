@@ -1,0 +1,5 @@
+Timing is on.
+ERROR:  syntax error at or near "("
+LINE 19:  l_shipdate <= date '1998-12-01' - interval '90' day (3)
+                                                              ^
+Time: 0.910 ms

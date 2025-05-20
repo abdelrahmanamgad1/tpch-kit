@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Coverage Comparison: GCOV vs LCOV</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .container {
+        display: flex;
+        gap: 20px;
+      }
+      .section {
+        flex: 1;
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 5px;
+      }
+      h2 {
+        color: #333;
+        margin-top: 0;
+      }
+      .summary {
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 3px;
+        margin-bottom: 15px;
+      }
+      .details {
+        background: #fff;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+      }
+      .covered {
+        color: green;
+      }
+      .not-covered {
+        color: red;
+      }
+      pre {
+        white-space: pre-wrap;
+        background: #f8f8f8;
+        padding: 10px;
+        border-radius: 3px;
+        overflow-x: auto;
+      }
+      .differences {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f0f0f0;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Coverage Comparison: GCOV vs LCOV</h1>
+
+    <div class="container">
+      <div class="section">
+        <h2>GCOV Results</h2>
+        <div class="summary">
+          <h3>Summary</h3>
+          <p>Line Coverage: 58.33% (28/48 lines)</p>
+          <p><em>Note: GCOV only shows line coverage in the summary</em></p>
+        </div>
+        <div class="details">
+          <h3>Detailed Coverage Output</h3>
+          <pre>
+File 'test_queries.c'
+Lines executed:58.33% of 48
+Creating 'test_queries.c.gcov'</pre
+          >
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>LCOV Results</h2>
+        <div class="summary">
+          <h3>Summary</h3>
+          <p>Line Coverage: 58.3% (28/48 lines)</p>
+          <p>Function Coverage: 75.0% (3/4 functions)</p>
+          <p>Source: test_queries.c</p>
+        </div>
+        <div class="details">
+          <h3>Coverage Details</h3>
+          <p>
+            LCOV provides both line and function coverage information for
+            test_queries.c
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="differences">
+      <h2>Key Differences</h2>
+      <h3>Coverage Metrics</h3>
+      <ul>
+        <li>GCOV shows line coverage with more decimal places (58.33%)</li>
+        <li>
+          LCOV shows:
+          <ul>
+            <li>Line coverage: 58.3% (28/48 lines)</li>
+            <li>Function coverage: 75.0% (3/4 functions)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>Output Format</h3>
+      <ul>
+        <li>GCOV provides line-by-line execution counts</li>
+        <li>LCOV generates summary statistics and HTML reports</li>
+      </ul>
+    </div>
+  </body>
+</html>

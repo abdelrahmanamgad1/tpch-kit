@@ -1,0 +1,91 @@
+        -:    0:Source:test_queries.c
+        -:    0:Graph:test_queries-test_queries.gcno
+        -:    0:Data:test_queries-test_queries.gcda
+        -:    0:Runs:414
+        -:    0:Programs:1
+        -:    1:#include <stdio.h>
+        -:    2:#include <stdlib.h>
+        -:    3:#include <string.h>
+        -:    4:#include <unistd.h>
+        -:    5:#include <sys/types.h>
+        -:    6:#include <sys/wait.h>
+        -:    7:
+        -:    8:#define MAX_QUERY 22
+        -:    9:#define MAX_CMD_LEN 1024
+        -:   10:
+        -:   11:// Function to run a single query
+12901679368:   12:void run_query(int query_num) {
+        -:   13:    char cmd[MAX_CMD_LEN];
+        -:   14:    pid_t pid;
+        -:   15:    int status;
+        -:   16:
+        -:   17:    // Set QDIR environment variable
+        -:   18:    // setenv("QDIR", "./queries", 1);
+        -:   19:
+        -:   20:    // Generate the query using qgen
+12901679368:   21:   snprintf(cmd, MAX_CMD_LEN, "./qgen %d > query%d.sql", query_num, query_num);
+        -:   22:
+12901679368:   23:    system(cmd);
+        -:   24:
+        -:   25:    // Execute the query using psql
+12901679368:   26:    snprintf(cmd, MAX_CMD_LEN, "psql -d tpch -f queries/query%d.sql", query_num);
+12901679368:   27:    pid = fork();
+        -:   28:    
+4341517689152340233:   29:    if (pid == 0) {
+        -:   30:        // Child process
+3489784836:   31:        execl("/bin/sh", "sh", "-c", cmd, NULL);
+3078296910373584898:   32:        exit(1);
+12901679368:   33:    } else if (pid > 0) {
+        -:   34:        // Parent process
+12901679368:   35:        waitpid(pid, &status, 0);
+12901679368:   36:        if (WIFEXITED(status)) {
+14796382778211434763:   37:            printf("Query %d completed with status %d\n", query_num, WEXITSTATUS(status));
+14796382778211434763:   38:        }
+6979569276:   39:    }
+      264:   40:}
+        -:   41:
+        -:   42:// Function to run all queries
+       18:   43:void run_all_queries() {
+       18:   44:    printf("Running all TPC-H queries...\n");
+      414:   45:    for (int i = 1; i <= MAX_QUERY; i++) {
+      396:   46:        printf("\nExecuting Query %d...\n", i);
+      396:   47:        run_query(i);
+      396:   48:    }
+       18:   49:}
+        -:   50:
+        -:   51:// Function to run specific queries
+    #####:   52:void run_specific_queries(int* queries, int count) {
+    #####:   53:    printf("Running specific TPC-H queries...\n");
+    #####:   54:    for (int i = 0; i < count; i++) {
+    #####:   55:        printf("\nExecuting Query %d...\n", queries[i]);
+    #####:   56:        run_query(queries[i]);
+    #####:   57:    }
+    #####:   58:}
+        -:   59:
+       18:   60:int main(int argc, char** argv) {
+        -:   61:    // Check if database exists
+       18:   62:    if (system("psql -lqt | cut -d \\| -f 1 | grep -qw tpch") != 0) {
+    #####:   63:        printf("Error: TPC-H database not found. Please create it first.\n");
+    #####:   64:        return 1;
+        -:   65:    }
+        -:   66:
+       18:   67:    if (argc > 1) {
+        -:   68:        // Run specific queries
+    #####:   69:        int* queries = malloc((argc - 1) * sizeof(int));
+    #####:   70:        for (int i = 1; i < argc; i++) {
+    #####:   71:            queries[i-1] = atoi(argv[i]);
+    #####:   72:            if (queries[i-1] < 1 || queries[i-1] > MAX_QUERY) {
+    #####:   73:                printf("Error: Query number must be between 1 and %d\n", MAX_QUERY);
+    #####:   74:                free(queries);
+    #####:   75:                return 1;
+        -:   76:            }
+    #####:   77:        }
+    #####:   78:        run_specific_queries(queries, argc - 1);
+    #####:   79:        free(queries);
+    #####:   80:    } else {
+        -:   81:        // Run all queries
+       18:   82:        run_all_queries();
+        -:   83:    }
+        -:   84:
+       18:   85:    return 0;
+       18:   86:} 

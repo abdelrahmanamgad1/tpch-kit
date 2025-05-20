@@ -1,0 +1,261 @@
+        -:    0:Source:bcd2.c
+        -:    0:Graph:bcd2.gcno
+        -:    0:Data:bcd2.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/*
+        -:    2:* $Id: bcd2.c,v 1.2 2005/01/03 20:08:58 jms Exp $
+        -:    3:*
+        -:    4:* Revision History
+        -:    5:* ===================
+        -:    6:* $Log: bcd2.c,v $
+        -:    7:* Revision 1.2  2005/01/03 20:08:58  jms
+        -:    8:* change line terminations
+        -:    9:*
+        -:   10:* Revision 1.1.1.1  2004/11/24 23:31:45  jms
+        -:   11:* re-establish external server
+        -:   12:*
+        -:   13:* Revision 1.1.1.1  2003/04/03 18:54:21  jms
+        -:   14:* recreation after CVS crash
+        -:   15:*
+        -:   16:* Revision 1.1.1.1  2003/04/03 18:54:21  jms
+        -:   17:* initial checkin
+        -:   18:*
+        -:   19:*
+        -:   20:*/
+        -:   21:/*
+        -:   22: * bcd.c: conversion routines for multi-byte arithmetic
+        -:   23: *
+        -:   24: * defined routines:
+        -:   25: * bin_bcd2(long binary, long *low_res, long *high_res)
+        -:   26: * bcd2_bin(long *dest, long bcd)
+        -:   27: * bcd2_add(long *bcd_low, long *bcd_high, long addend)
+        -:   28: * bcd2_sub(long *bcd_low, long *bcd_high, long subend)
+        -:   29: * bcd2_mul(long *bcd_low, long *bcd_high, long multiplier)
+        -:   30: * bcd2_div(long *bcd_low, long *bcd_high, long divisor)
+        -:   31: * long bcd2_mod(long *bcd_low, long *bcd_high, long modulo)
+        -:   32: * long bcd2_cmp(long *bcd_low, long *bcd_high, long compare)
+        -:   33: */
+        -:   34:#include <stdio.h>
+        -:   35:#include "bcd2.h"	/* for function prototypes */
+        -:   36:
+        -:   37:#define DIGITS_PER_LONG 7
+        -:   38:#define WORD_DIVISOR    10000000
+        -:   39:#define GET_DIGIT(num, low, high) \
+        -:   40:    ((num) >= DIGITS_PER_LONG)? \
+        -:   41:        (high & (0xF << (4 * ((num) - DIGITS_PER_LONG)))) \
+        -:   42:            >> (((num) - DIGITS_PER_LONG) * 4): \
+        -:   43:        (low & (0xF << (4 * (num)))) >> ((num) * 4)
+        -:   44:#define SET_DIGIT(value, num, low, high) \
+        -:   45:    if ((num) >= DIGITS_PER_LONG) \
+        -:   46:        { \
+        -:   47:        *high &= \
+        -:   48:            (0xFFFFFFF ^ (0xF << (4 * ((num) - DIGITS_PER_LONG)))); \
+        -:   49:        *high |= (value << (4 * ((num) - DIGITS_PER_LONG))); \
+        -:   50:        } \
+        -:   51:    else \
+        -:   52:        { \
+        -:   53:        *low = (*low & (0xFFFFFFF ^ (0xF << (4 * (num))))); \
+        -:   54:        *low |= (value << (4 * (num))); \
+        -:   55:        }
+        -:   56:int 
+    #####:   57:bin_bcd2(long binary, long *low_res, long *high_res)
+        -:   58:{
+        -:   59:    char number[15],
+        -:   60:         *current;
+        -:   61:    int count;  
+        -:   62:    long *dest;
+        -:   63:
+    #####:   64:	*low_res = *high_res = 0;
+    #####:   65:    sprintf(number, "%014ld", binary);
+    #####:   66:    for (current = number, count=13; *current; current++, count--)
+        -:   67:        {
+    #####:   68:        dest = (count < DIGITS_PER_LONG)?low_res:high_res;
+    #####:   69:        *dest = *dest << 4;
+    #####:   70:        *dest |= *current - '0';
+    #####:   71:        }
+    #####:   72:    return(0);
+        -:   73:}
+        -:   74:
+        -:   75:int
+    #####:   76:bcd2_bin(long *dest, long bcd)
+        -:   77:{
+        -:   78:    int count;
+        -:   79:    long mask;
+        -:   80:         
+    #####:   81:    count = DIGITS_PER_LONG - 1;
+    #####:   82:    mask = 0xF000000;
+    #####:   83:	*dest = 0;
+    #####:   84:    while (mask)
+        -:   85:        {
+    #####:   86:        *dest *= 10;
+    #####:   87:        *dest += (bcd & mask) >> (4 * count);
+    #####:   88:        mask = mask >> 4;
+    #####:   89:        count -= 1;
+        -:   90:        }
+    #####:   91:    return(0);
+        -:   92:}
+        -:   93:
+        -:   94:int
+    #####:   95:bcd2_add(long *bcd_low, long *bcd_high, long addend)
+        -:   96:{
+        -:   97:    long tmp_lo, tmp_hi, carry, res;
+        -:   98:    int digit;
+        -:   99:
+    #####:  100:    bin_bcd2(addend, &tmp_lo, &tmp_hi);
+    #####:  101:    carry = 0;
+    #####:  102:    for (digit=0; digit < 14; digit++)
+        -:  103:        {
+    #####:  104:        res = GET_DIGIT(digit, *bcd_low, *bcd_high); 
+    #####:  105:        res += GET_DIGIT(digit, tmp_lo, tmp_hi);
+    #####:  106:        res += carry;
+    #####:  107:        carry = res / 10;
+    #####:  108:        res %= 10;
+    #####:  109:        SET_DIGIT(res, digit, bcd_low, bcd_high);
+    #####:  110:        }
+    #####:  111:    return(carry);
+        -:  112:}
+        -:  113:
+        -:  114:int
+    #####:  115:bcd2_sub(long *bcd_low, long *bcd_high, long subend)
+        -:  116:{
+        -:  117:    long tmp_lo, tmp_hi, carry, res;
+        -:  118:    int digit;
+        -:  119:
+    #####:  120:    bin_bcd2(subend, &tmp_lo, &tmp_hi);
+    #####:  121:    carry = 0;
+    #####:  122:    for (digit=0; digit < 14; digit++)
+        -:  123:        {
+    #####:  124:        res = GET_DIGIT(digit, *bcd_low, *bcd_high); 
+    #####:  125:        res -= GET_DIGIT(digit, tmp_lo, tmp_hi);
+    #####:  126:        res -= carry;
+    #####:  127:        if (res < 0) 
+        -:  128:			{
+    #####:  129:			res += 10;
+    #####:  130:			carry = 1;
+    #####:  131:			}
+    #####:  132:        SET_DIGIT(res, digit, bcd_low, bcd_high);
+    #####:  133:        }
+    #####:  134:    return(carry);
+        -:  135:}
+        -:  136:
+        -:  137:int
+    #####:  138:bcd2_mul(long *bcd_low, long *bcd_high, long multiplier)
+        -:  139:{
+        -:  140:    long tmp_lo, tmp_hi, carry, m_lo, m_hi, m1, m2;
+        -:  141:    int udigit, ldigit, res;
+        -:  142:
+    #####:  143:    tmp_lo = *bcd_low;
+    #####:  144:    tmp_hi = *bcd_high;
+    #####:  145:    bin_bcd2(multiplier, &m_lo, &m_hi);
+    #####:  146:    *bcd_low = 0;
+    #####:  147:    *bcd_high = 0;
+    #####:  148:    carry = 0;
+    #####:  149:    for (ldigit=0; ldigit < 14; ldigit++)
+        -:  150:        {
+    #####:  151:        m1 = GET_DIGIT(ldigit, m_lo, m_hi); 
+    #####:  152:        carry = 0;
+    #####:  153:        for (udigit=0; udigit < 14; udigit++)
+        -:  154:            {
+    #####:  155:            m2 = GET_DIGIT(udigit, tmp_lo, tmp_hi);
+    #####:  156:            res = m1 * m2;
+    #####:  157:            res += carry;
+    #####:  158:            if (udigit + ldigit < 14)
+        -:  159:                {
+    #####:  160:                carry = GET_DIGIT(udigit + ldigit, *bcd_low, *bcd_high);
+    #####:  161:                res += carry;
+    #####:  162:                }
+    #####:  163:            carry = res / 10;
+    #####:  164:            res %= 10;
+    #####:  165:            if (udigit + ldigit < 14)
+    #####:  166:                SET_DIGIT(res, udigit + ldigit, bcd_low, bcd_high);
+    #####:  167:            }
+    #####:  168:        }
+    #####:  169:    return(carry);
+        -:  170:}
+        -:  171:
+        -:  172:int
+    #####:  173:bcd2_div(long *bcd_low, long *bcd_high, long divisor)
+        -:  174:{
+        -:  175:    long tmp_lo, tmp_hi, carry, d1, res, digit;
+        -:  176:    
+        -:  177:
+    #####:  178:    carry = 0;
+    #####:  179:    tmp_lo = *bcd_low;
+    #####:  180:    tmp_hi = *bcd_high;
+    #####:  181:    *bcd_low = *bcd_high = 0;
+    #####:  182:    for (digit=13; digit >= 0; digit--)
+        -:  183:        {
+    #####:  184:        d1 = GET_DIGIT(digit, tmp_lo, tmp_hi);
+    #####:  185:        d1 += 10 * carry; 
+    #####:  186:        res = d1 / divisor;
+    #####:  187:        carry = d1 % divisor;
+    #####:  188:        SET_DIGIT(res, digit, bcd_low, bcd_high);
+    #####:  189:        }
+    #####:  190:    return(carry);
+        -:  191:}
+        -:  192:
+        -:  193:long
+    #####:  194:bcd2_mod(long *bcd_low, long *bcd_high, long modulo)
+        -:  195:{
+        -:  196:	long tmp_low, tmp_high;
+        -:  197:
+    #####:  198:	tmp_low = *bcd_low;
+    #####:  199:	tmp_high = *bcd_high;
+    #####:  200:	while (tmp_high || tmp_low > modulo)
+    #####:  201:		bcd2_sub(&tmp_low, &tmp_high, modulo);
+    #####:  202:	return(tmp_low);
+        -:  203:}
+        -:  204:
+        -:  205:long
+    #####:  206:bcd2_cmp(long *low1, long *high1, long comp)
+        -:  207:{
+    #####:  208:	long temp = 0;
+        -:  209:
+    #####:  210:    bcd2_bin(&temp, *high1);
+    #####:  211:	if (temp > 214) 
+    #####:  212:		return(1);
+    #####:  213:    bcd2_bin(&temp, *low1);
+    #####:  214:	return(temp - comp);
+    #####:  215:}
+        -:  216:
+        -:  217:#ifdef TEST_BCD
+        -:  218:#include <values.h>
+        -:  219:
+        -:  220:main()
+        -:  221:{
+        -:  222:long bin, low_bcd, high_bcd;
+        -:  223:int i;
+        -:  224:
+        -:  225:bin = MAXINT;
+        -:  226:printf("%ld\n", bin);
+        -:  227:bin_bcd2(bin, &low_bcd, &high_bcd);
+        -:  228:printf("%ld  %ld\n", high_bcd, low_bcd);
+        -:  229:bin = 0;
+        -:  230:bcd2_bin(&bin, high_bcd);
+        -:  231:bcd2_bin(&bin, low_bcd);
+        -:  232:printf( "%ld\n", bin);
+        -:  233:for (i=9; i >= 0; i--)
+        -:  234:    printf("%dth digit in %d is %d\n", 
+        -:  235:        i, bin, GET_DIGIT(i, low_bcd, high_bcd));
+        -:  236:bcd2_add(&low_bcd, &high_bcd, MAXINT);
+        -:  237:bin = 0;
+        -:  238:bcd2_bin(&bin, high_bcd);
+        -:  239:high_bcd = bin;
+        -:  240:bin = 0;
+        -:  241:bcd2_bin(&bin, low_bcd);
+        -:  242:low_bcd = bin;
+        -:  243:printf( "%ld%07ld\n", high_bcd, low_bcd);
+        -:  244:bin_bcd2(14, &low_bcd, &high_bcd);
+        -:  245:bcd2_mul(&low_bcd, &high_bcd, 23L);
+        -:  246:bin = 0;
+        -:  247:bcd2_bin(&bin, high_bcd);
+        -:  248:bcd2_bin(&bin, low_bcd);
+        -:  249:printf( "%ld\n", bin);
+        -:  250:bcd2_div(&low_bcd, &high_bcd, 10L);
+        -:  251:bin = 0;
+        -:  252:bcd2_bin(&bin, high_bcd);
+        -:  253:bcd2_bin(&bin, low_bcd);
+        -:  254:printf( "%ld\n", bin);
+        -:  255:}
+        -:  256:#endif /* TEST */

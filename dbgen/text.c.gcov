@@ -1,0 +1,391 @@
+        -:    0:Source:text.c
+        -:    0:Graph:text.gcno
+        -:    0:Data:text.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/*
+        -:    2:* $Id: text.c,v 1.6 2006/07/31 17:23:09 jms Exp $
+        -:    3:*
+        -:    4:* Revision History
+        -:    5:* ===================
+        -:    6:* $Log: text.c,v $
+        -:    7:* Revision 1.6  2006/07/31 17:23:09  jms
+        -:    8:* fix to parallelism problem
+        -:    9:*
+        -:   10:* Revision 1.5  2006/05/18 23:50:00  jms
+        -:   11:* commit text generation change with larger buffer
+        -:   12:*
+        -:   13:* Revision 1.4  2006/05/16 16:26:51  jms
+        -:   14:* remove calls to FAKE_V_STR
+        -:   15:*
+        -:   16:* Revision 1.3  2006/05/16 15:55:58  jms
+        -:   17:* first cut to Meikel
+        -:   18:*
+        -:   19:* Revision 1.2  2005/01/03 20:08:59  jms
+        -:   20:* change line terminations
+        -:   21:*
+        -:   22:* Revision 1.1.1.1  2004/11/24 23:31:47  jms
+        -:   23:* re-establish external server
+        -:   24:*
+        -:   25:* Revision 1.1.1.1  2003/08/07 17:58:34  jms
+        -:   26:* recreation after CVS crash
+        -:   27:*
+        -:   28:* Revision 1.2  2003/08/07 17:58:34  jms
+        -:   29:* Convery RNG to 64bit space as preparation for new large scale RNG
+        -:   30:*
+        -:   31:* Revision 1.1.1.1  2003/04/03 18:54:21  jms
+        -:   32:* initial checkin
+        -:   33:*
+        -:   34:*
+        -:   35:*/
+        -:   36:/*
+        -:   37: * text.c --- pseaudo text generator for use in DBGEN 2.0
+        -:   38: *
+        -:   39: * Defined Routines:
+        -:   40: *		dbg_text() -- select and translate a sentance form
+        -:   41: */
+        -:   42:
+        -:   43:#ifdef TEXT_TEST
+        -:   44:#define DECLARER
+        -:   45:#endif /* TEST */
+        -:   46:
+        -:   47:#include "config.h"
+        -:   48:#include <stdlib.h>
+        -:   49:#if (defined(_POSIX_)||!defined(WIN32))		/* Change for Windows NT */
+        -:   50:#include <unistd.h>
+        -:   51:#include <sys/wait.h>
+        -:   52:#endif /* WIN32 */
+        -:   53:#include <stdio.h>				/* */
+        -:   54:#include <limits.h>
+        -:   55:#include <math.h>
+        -:   56:#include <ctype.h>
+        -:   57:#include <signal.h>
+        -:   58:#include <string.h>
+        -:   59:#include <errno.h>
+        -:   60:#ifdef HP
+        -:   61:#include <strings.h>
+        -:   62:#endif
+        -:   63:#if (defined(WIN32)&&!defined(_POSIX_))
+        -:   64:#include <process.h>
+        -:   65:#pragma warning(disable:4201)
+        -:   66:#pragma warning(disable:4214)
+        -:   67:#pragma warning(disable:4514)
+        -:   68:#define WIN32_LEAN_AND_MEAN
+        -:   69:#define NOATOM
+        -:   70:#define NOGDICAPMASKS
+        -:   71:#define NOMETAFILE
+        -:   72:#define NOMINMAX
+        -:   73:#define NOMSG
+        -:   74:#define NOOPENFILE
+        -:   75:#define NORASTEROPS
+        -:   76:#define NOSCROLL
+        -:   77:#define NOSOUND
+        -:   78:#define NOSYSMETRICS
+        -:   79:#define NOTEXTMETRIC
+        -:   80:#define NOWH
+        -:   81:#define NOCOMM
+        -:   82:#define NOKANJI
+        -:   83:#define NOMCX
+        -:   84:#include <windows.h>
+        -:   85:#pragma warning(default:4201)
+        -:   86:#pragma warning(default:4214)
+        -:   87:#endif
+        -:   88:
+        -:   89:#define TEXT_POOL_SIZE (300 * 1024 * 1024)  /* 300MiB */
+        -:   90:
+        -:   91:#include "dss.h"
+        -:   92:#include "dsstypes.h"
+        -:   93:
+        -:   94:/* 
+        -:   95: * txt_vp() -- 
+        -:   96: *		generate a verb phrase by
+        -:   97: *		1) selecting a verb phrase form
+        -:   98: *		2) parsing it to select parts of speech
+        -:   99: *		3) selecting appropriate words
+        -:  100: *		4) adding punctuation as required
+        -:  101: *
+        -:  102: *	Returns: length of generated phrase
+        -:  103: *	Called By: txt_sentence()
+        -:  104: *	Calls: pick_str() 
+        -:  105: */
+        -:  106:static int
+    #####:  107:txt_vp(char *dest, int sd) 
+        -:  108:{
+        -:  109:	char syntax[MAX_GRAMMAR_LEN + 1],
+        -:  110:		*cptr,
+        -:  111:		*parse_target;
+        -:  112:	distribution *src;
+        -:  113:	int i,
+    #####:  114:		res = 0;
+        -:  115:
+        -:  116:	
+    #####:  117:	pick_str(&vp, sd, &syntax[0]);
+    #####:  118:	parse_target = syntax;
+    #####:  119:	while ((cptr = strtok(parse_target, " ")) != NULL)
+        -:  120:	{
+    #####:  121:		src = NULL;
+    #####:  122:		switch(*cptr)
+        -:  123:		{
+        -:  124:		case 'D':
+    #####:  125:			src = &adverbs;
+    #####:  126:			break;
+        -:  127:		case 'V':
+    #####:  128:			src = &verbs;
+    #####:  129:			break;
+        -:  130:		case 'X': 
+    #####:  131:			src = &auxillaries;
+    #####:  132:			break;
+        -:  133:		}	/* end of POS switch statement */
+    #####:  134:		i = pick_str(src, sd, dest);
+    #####:  135:		i = (int)strlen(DIST_MEMBER(src, i));
+    #####:  136:		dest += i;
+    #####:  137:		res += i;
+    #####:  138:		if (*(++cptr))	/* miscelaneous fillagree, like punctuation */
+        -:  139:		{
+    #####:  140:			dest += 1;
+    #####:  141:			res += 1;
+    #####:  142:			*dest = *cptr;
+    #####:  143:		}
+    #####:  144:		*dest = ' ';
+    #####:  145:		dest++;
+    #####:  146:		res++;
+    #####:  147:		parse_target = NULL;
+        -:  148:	}	/* end of while loop */
+        -:  149:
+    #####:  150:	return(res);
+        -:  151:}
+        -:  152:
+        -:  153:/* 
+        -:  154: * txt_np() -- 
+        -:  155: *		generate a noun phrase by
+        -:  156: *		1) selecting a noun phrase form
+        -:  157: *		2) parsing it to select parts of speech
+        -:  158: *		3) selecting appropriate words
+        -:  159: *		4) adding punctuation as required
+        -:  160: *
+        -:  161: *	Returns: length of generated phrase
+        -:  162: *	Called By: txt_sentence()
+        -:  163: *	Calls: pick_str(), 
+        -:  164: */
+        -:  165:static int
+    #####:  166:txt_np(char *dest, int sd) 
+        -:  167:{
+        -:  168:	char syntax[MAX_GRAMMAR_LEN + 1],
+        -:  169:		*cptr,
+        -:  170:		*parse_target;
+        -:  171:	distribution *src;
+        -:  172:	int i,
+    #####:  173:		res = 0;
+        -:  174:
+        -:  175:	
+    #####:  176:	pick_str(&np, sd, &syntax[0]);
+    #####:  177:	parse_target = syntax;
+    #####:  178:	while ((cptr = strtok(parse_target, " ")) != NULL)
+        -:  179:	{
+    #####:  180:		src = NULL;
+    #####:  181:		switch(*cptr)
+        -:  182:		{
+        -:  183:		case 'A':
+    #####:  184:			src = &articles;
+    #####:  185:			break;
+        -:  186:		case 'J':
+    #####:  187:			src = &adjectives;
+    #####:  188:			break;
+        -:  189:		case 'D':
+    #####:  190:			src = &adverbs;
+    #####:  191:			break;
+        -:  192:		case 'N': 
+    #####:  193:			src = &nouns;
+    #####:  194:			break;
+        -:  195:		}	/* end of POS switch statement */
+    #####:  196:		i = pick_str(src, sd, dest);
+    #####:  197:		i = (int)strlen(DIST_MEMBER(src, i));
+    #####:  198:		dest += i;
+    #####:  199:		res += i;
+    #####:  200:		if (*(++cptr))	/* miscelaneous fillagree, like punctuation */
+        -:  201:		{
+    #####:  202:			*dest = *cptr;
+    #####:  203:			dest += 1;
+    #####:  204:			res += 1;
+    #####:  205:		}
+    #####:  206:		*dest = ' ';
+    #####:  207:		dest++;
+    #####:  208:		res++;
+    #####:  209:		parse_target = NULL;
+        -:  210:	}	/* end of while loop */
+        -:  211:
+    #####:  212:	return(res);
+        -:  213:}
+        -:  214:
+        -:  215:/* 
+        -:  216: * txt_sentence() -- 
+        -:  217: *		generate a sentence by
+        -:  218: *		1) selecting a sentence form
+        -:  219: *		2) parsing it to select parts of speech or phrase types
+        -:  220: *		3) selecting appropriate words
+        -:  221: *		4) adding punctuation as required
+        -:  222: *
+        -:  223: *	Returns: length of generated sentence
+        -:  224: *	Called By: dbg_text()
+        -:  225: *	Calls: pick_str(), txt_np(), txt_vp() 
+        -:  226: */
+        -:  227:static int
+    #####:  228:txt_sentence(char *dest, int sd) 
+        -:  229:{
+        -:  230:	char syntax[MAX_GRAMMAR_LEN + 1],
+        -:  231:		*cptr;
+        -:  232:	int i,
+    #####:  233:		res = 0,
+    #####:  234:		len = 0;
+        -:  235:
+        -:  236:	
+    #####:  237:	pick_str(&grammar, sd, syntax);
+    #####:  238:	cptr = syntax;
+        -:  239:
+        -:  240:next_token:	/* I hate goto's, but can't seem to have parent and child use strtok() */
+    #####:  241:	while (*cptr && *cptr == ' ')
+    #####:  242:		cptr++;
+    #####:  243:	if (*cptr == '\0')
+    #####:  244:		goto done;
+    #####:  245:	switch(*cptr)
+        -:  246:		{
+        -:  247:		case 'V':
+    #####:  248:			len = txt_vp(dest, sd);
+    #####:  249:			break;
+        -:  250:		case 'N': 
+    #####:  251:			len = txt_np(dest, sd);
+    #####:  252:			break;
+        -:  253:		case 'P':
+    #####:  254:			i = pick_str(&prepositions, sd, dest);
+    #####:  255:			len = (int)strlen(DIST_MEMBER(&prepositions, i));
+    #####:  256:			strcpy((dest + len), " the ");
+    #####:  257:			len += 5;
+    #####:  258:			len += txt_np(dest + len, sd);
+    #####:  259:			break;
+        -:  260:		case 'T':
+    #####:  261:			i = pick_str(&terminators, sd, --dest); /*terminators should abut previous word */
+    #####:  262:			len = (int)strlen(DIST_MEMBER(&terminators, i));
+    #####:  263:			break;
+        -:  264:		}	/* end of POS switch statement */
+    #####:  265:		dest += len;
+    #####:  266:		res += len;
+    #####:  267:		cptr++;
+    #####:  268:		if (*cptr && *cptr != ' ')	/* miscelaneous fillagree, like punctuation */
+        -:  269:		{
+    #####:  270:			dest += 1;
+    #####:  271:			res += 1;
+    #####:  272:			*dest = *cptr;
+    #####:  273:		}
+    #####:  274:		goto next_token;
+        -:  275:done:
+    #####:  276:	*dest = '\0';
+    #####:  277:	return(--res);
+        -:  278:}
+        -:  279:
+        -:  280:/*
+        -:  281: * dbg_text() -- 
+        -:  282: *		produce ELIZA-like text of random, bounded length, truncating the last 
+        -:  283: *		generated sentence as required
+        -:  284: */
+        -:  285:void
+    #####:  286:dbg_text(char *tgt, int min, int max, int sd)
+        -:  287:{
+    #####:  288:   DSS_HUGE hgLength = 0,
+        -:  289:      hgOffset,
+    #####:  290:      wordlen = 0,
+        -:  291:      s_len,
+        -:  292:      needed;
+        -:  293:   char sentence[MAX_SENT_LEN + 1],
+        -:  294:      *cp;
+        -:  295:   static char szTextPool[TEXT_POOL_SIZE + 1];
+        -:  296:   static int bInit = 0;
+    #####:  297:   int nLifeNoise = 0;
+        -:  298:   
+    #####:  299:   if (!bInit)
+        -:  300:   {
+    #####:  301:      cp = &szTextPool[0];
+    #####:  302:      if (verbose > 0)
+    #####:  303:         fprintf(stderr, "\nPreloading text ... ");
+        -:  304:      
+    #####:  305:      while (wordlen < TEXT_POOL_SIZE)
+        -:  306:      {
+    #####:  307:         if ((verbose > 0) && (wordlen > nLifeNoise))
+        -:  308:         {
+    #####:  309:            nLifeNoise += 200000;
+    #####:  310:            fprintf(stderr, "%3.0f%%\b\b\b\b", (100.0 * wordlen)/TEXT_POOL_SIZE);
+    #####:  311:         }
+        -:  312:         
+    #####:  313:         s_len = txt_sentence(sentence, 5);
+    #####:  314:         if ( s_len < 0)
+    #####:  315:            INTERNAL_ERROR("Bad sentence formation");
+    #####:  316:         needed = TEXT_POOL_SIZE - wordlen;
+    #####:  317:         if (needed >= (s_len + 1))	/* need the entire sentence */
+        -:  318:         {
+    #####:  319:            strcpy(cp, sentence);
+    #####:  320:            cp += s_len;
+    #####:  321:            wordlen += s_len + 1;
+    #####:  322:            *(cp++) = ' ';
+    #####:  323:         }
+        -:  324:         else /* chop the new sentence off to match the length target */
+        -:  325:         {
+    #####:  326:            sentence[needed] = '\0';
+    #####:  327:            strcpy(cp, sentence);
+    #####:  328:            wordlen += needed;
+    #####:  329:            cp += needed;
+        -:  330:         }
+        -:  331:      }
+    #####:  332:      *cp = '\0';
+    #####:  333:      bInit = 1;
+    #####:  334:      if (verbose > 0)
+    #####:  335:         fprintf(stderr, "\n");
+    #####:  336:   }
+        -:  337:
+    #####:  338:   RANDOM(hgOffset, 0, TEXT_POOL_SIZE - max, sd);
+    #####:  339:   RANDOM(hgLength, min, max, sd);
+    #####:  340:   strncpy(&tgt[0], &szTextPool[hgOffset], (int)hgLength);
+    #####:  341:   tgt[hgLength] = '\0';
+        -:  342:
+    #####:  343:	return;
+        -:  344:}
+        -:  345:
+        -:  346:#ifdef TEXT_TEST
+        -:  347:tdef tdefs[1] = { NULL };
+        -:  348:distribution nouns,
+        -:  349:      verbs,
+        -:  350:      adjectives,
+        -:  351:      adverbs,
+        -:  352:      auxillaries,
+        -:  353:      terminators,
+        -:  354:      articles,
+        -:  355:      prepositions,
+        -:  356:      grammar,
+        -:  357:      np,
+        -:  358:      vp;
+        -:  359:
+        -:  360:main()
+        -:  361:{
+        -:  362:	char prattle[401];
+        -:  363:	
+        -:  364:	verbose = 1;
+        -:  365:   
+        -:  366:   read_dist (env_config (DIST_TAG, DIST_DFLT), "nouns", &nouns);
+        -:  367:	read_dist (env_config (DIST_TAG, DIST_DFLT), "verbs", &verbs);
+        -:  368:	read_dist (env_config (DIST_TAG, DIST_DFLT), "adjectives", &adjectives);
+        -:  369:	read_dist (env_config (DIST_TAG, DIST_DFLT), "adverbs", &adverbs);
+        -:  370:	read_dist (env_config (DIST_TAG, DIST_DFLT), "auxillaries", &auxillaries);
+        -:  371:	read_dist (env_config (DIST_TAG, DIST_DFLT), "terminators", &terminators);
+        -:  372:	read_dist (env_config (DIST_TAG, DIST_DFLT), "articles", &articles);
+        -:  373:	read_dist (env_config (DIST_TAG, DIST_DFLT), "prepositions", &prepositions);
+        -:  374:	read_dist (env_config (DIST_TAG, DIST_DFLT), "grammar", &grammar);
+        -:  375:	read_dist (env_config (DIST_TAG, DIST_DFLT), "np", &np);
+        -:  376:	read_dist (env_config (DIST_TAG, DIST_DFLT), "vp", &vp);
+        -:  377:
+        -:  378:	while (1)
+        -:  379:	{
+        -:  380:		dbg_text(&prattle[0], 300, 400, 0);
+        -:  381:		printf("<%s>\n", prattle);
+        -:  382:	}
+        -:  383:
+        -:  384:	return(0);
+        -:  385:}
+        -:  386:#endif /* TEST */

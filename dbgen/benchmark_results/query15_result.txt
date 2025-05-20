@@ -1,0 +1,5 @@
+Timing is on.
+ERROR:  syntax error at or near "view"
+LINE 5: create view revenue:s (supplier_no, total_revenue) as
+               ^
+Time: 0.302 ms

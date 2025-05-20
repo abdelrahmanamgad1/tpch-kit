@@ -224,7 +224,7 @@
 #ifndef DSS_HUGE
 #error Support for a 64-bit datatype is required in this release
 #endif
-
 #ifndef DOUBLE_CAST
 #define DOUBLE_CAST (double)
 #endif /* DOUBLE_CAST */
+

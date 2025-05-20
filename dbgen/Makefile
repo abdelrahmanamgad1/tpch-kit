@@ -107,10 +107,14 @@ CC      = gcc
 #                                  SGI, SUN, U2200, VMS, LINUX, WIN32
 # Current values for WORKLOAD are:  TPCH
 DATABASE = POSTGRESQL
-MACHINE  = LINUX
+MACHINE  = MACOS
 WORKLOAD = TPCH
 #
-CFLAGS	= -g -DDBNAME=\"dss\" -D$(MACHINE) -D$(DATABASE) -D$(WORKLOAD) -DRNG_TEST -D_FILE_OFFSET_BITS=64
+# Coverage flags
+COVERAGE_CFLAGS = -fprofile-arcs -ftest-coverage -DSTDLIB_HAS_GETOPT -DMACOS -DTPCH -DSUPPORT_64BITS -DDSS_HUGE='long long int' -DHUGE_FORMAT='"%lld"' -DHUGE_DATE_FORMAT='"%02lld"' -DRNG_A=6364136223846793005ull -DRNG_C=1ull
+COVERAGE_LDFLAGS =
+#
+CFLAGS	= -g -DDBNAME=\"dss\" -DMACOS -D$(DATABASE) -D$(WORKLOAD) -DRNG_TEST -D_FILE_OFFSET_BITS=64
 LDFLAGS = -O
 # The OBJ,EXE and LIB macros will need to be changed for compilation under
 #  Windows NT
@@ -173,6 +177,11 @@ ALLSRC=$(DBGENSRC) $(REFERENCE) $(QSRC) $(SCRIPTS)
 JUNK  =
 #
 all: $(PROGS)
+
+coverage: CFLAGS += $(COVERAGE_CFLAGS)
+coverage: LDFLAGS += $(COVERAGE_LDFLAGS)
+coverage: clean $(PROGS)
+
 $(PROG1): $(OBJ1) $(SETS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ1) $(LIBS)
 $(PROG2): permute.h $(OBJ2)

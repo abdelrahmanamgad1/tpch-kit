@@ -1,0 +1,5 @@
+Timing is on.
+ERROR:  syntax error at or near "-"
+LINE 25: -1 -1
+         ^
+Time: 0.502 ms

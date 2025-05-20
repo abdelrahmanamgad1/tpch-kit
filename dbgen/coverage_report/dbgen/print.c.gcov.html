@@ -1,0 +1,528 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - dbgen/print.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory dbgen">dbgen</a> - print.c<span style="font-size: 80%;"> (source / <a href="print.c.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryLo">73.9&nbsp;%</td>
+            <td class="headerCovTableEntry">203</td>
+            <td class="headerCovTableEntry">150</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-05-20 02:46:14</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">92.3&nbsp;%</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntry">12</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>              : /*</span>
+<span id="L2"><span class="lineNum">       2</span>              : * $Id: print.c,v 1.3 2005/10/28 02:56:22 jms Exp $</span>
+<span id="L3"><span class="lineNum">       3</span>              : *</span>
+<span id="L4"><span class="lineNum">       4</span>              : * Revision History</span>
+<span id="L5"><span class="lineNum">       5</span>              : * ===================</span>
+<span id="L6"><span class="lineNum">       6</span>              : * $Log: print.c,v $</span>
+<span id="L7"><span class="lineNum">       7</span>              : * Revision 1.3  2005/10/28 02:56:22  jms</span>
+<span id="L8"><span class="lineNum">       8</span>              : * add platform-specific printf formats to allow for DSS_HUGE data type</span>
+<span id="L9"><span class="lineNum">       9</span>              : *</span>
+<span id="L10"><span class="lineNum">      10</span>              : * Revision 1.2  2005/01/03 20:08:59  jms</span>
+<span id="L11"><span class="lineNum">      11</span>              : * change line terminations</span>
+<span id="L12"><span class="lineNum">      12</span>              : *</span>
+<span id="L13"><span class="lineNum">      13</span>              : * Revision 1.1.1.1  2004/11/24 23:31:47  jms</span>
+<span id="L14"><span class="lineNum">      14</span>              : * re-establish external server</span>
+<span id="L15"><span class="lineNum">      15</span>              : *</span>
+<span id="L16"><span class="lineNum">      16</span>              : * Revision 1.4  2004/02/18 16:26:49  jms</span>
+<span id="L17"><span class="lineNum">      17</span>              : * 32/64 bit changes for overflow handling needed additional changes when ported back to windows</span>
+<span id="L18"><span class="lineNum">      18</span>              : *</span>
+<span id="L19"><span class="lineNum">      19</span>              : * Revision 1.3  2004/02/18 14:05:53  jms</span>
+<span id="L20"><span class="lineNum">      20</span>              : * porting changes for LINUX and 64 bit RNG</span>
+<span id="L21"><span class="lineNum">      21</span>              : *</span>
+<span id="L22"><span class="lineNum">      22</span>              : * Revision 1.2  2004/01/22 05:49:29  jms</span>
+<span id="L23"><span class="lineNum">      23</span>              : * AIX porting (AIX 5.1)</span>
+<span id="L24"><span class="lineNum">      24</span>              : *</span>
+<span id="L25"><span class="lineNum">      25</span>              : * Revision 1.1.1.1  2003/08/07 17:58:34  jms</span>
+<span id="L26"><span class="lineNum">      26</span>              : * recreation after CVS crash</span>
+<span id="L27"><span class="lineNum">      27</span>              : *</span>
+<span id="L28"><span class="lineNum">      28</span>              : * Revision 1.2  2003/08/07 17:58:34  jms</span>
+<span id="L29"><span class="lineNum">      29</span>              : * Convery RNG to 64bit space as preparation for new large scale RNG</span>
+<span id="L30"><span class="lineNum">      30</span>              : *</span>
+<span id="L31"><span class="lineNum">      31</span>              : * Revision 1.1.1.1  2003/04/03 18:54:21  jms</span>
+<span id="L32"><span class="lineNum">      32</span>              : * initial checkin</span>
+<span id="L33"><span class="lineNum">      33</span>              : *</span>
+<span id="L34"><span class="lineNum">      34</span>              : *</span>
+<span id="L35"><span class="lineNum">      35</span>              : */</span>
+<span id="L36"><span class="lineNum">      36</span>              : /* generate flat files for data load */</span>
+<span id="L37"><span class="lineNum">      37</span>              : #include &lt;stdio.h&gt;</span>
+<span id="L38"><span class="lineNum">      38</span>              : #ifndef VMS</span>
+<span id="L39"><span class="lineNum">      39</span>              : #include &lt;sys/types.h&gt;</span>
+<span id="L40"><span class="lineNum">      40</span>              : #endif</span>
+<span id="L41"><span class="lineNum">      41</span>              : #if defined(SUN)</span>
+<span id="L42"><span class="lineNum">      42</span>              : #include &lt;unistd.h&gt;</span>
+<span id="L43"><span class="lineNum">      43</span>              : #endif</span>
+<span id="L44"><span class="lineNum">      44</span>              : #include &lt;math.h&gt;</span>
+<span id="L45"><span class="lineNum">      45</span>              : </span>
+<span id="L46"><span class="lineNum">      46</span>              : #include &quot;dss.h&quot;</span>
+<span id="L47"><span class="lineNum">      47</span>              : #include &quot;dsstypes.h&quot;</span>
+<span id="L48"><span class="lineNum">      48</span>              : #include &lt;string.h&gt;</span>
+<span id="L49"><span class="lineNum">      49</span>              : </span>
+<span id="L50"><span class="lineNum">      50</span>              : /*</span>
+<span id="L51"><span class="lineNum">      51</span>              :  * Function Prototypes</span>
+<span id="L52"><span class="lineNum">      52</span>              :  */</span>
+<span id="L53"><span class="lineNum">      53</span>              : FILE *print_prep PROTO((int table, int update));</span>
+<span id="L54"><span class="lineNum">      54</span>              : int pr_drange PROTO((int tbl, DSS_HUGE min, DSS_HUGE cnt, long num));</span>
+<span id="L55"><span class="lineNum">      55</span>              : </span>
+<span id="L56"><span class="lineNum">      56</span>              : FILE *</span>
+<span id="L57"><span class="lineNum">      57</span> <span class="tlaGNC">           8 : print_prep(int table, int update)</span></span>
+<span id="L58"><span class="lineNum">      58</span>              : {</span>
+<span id="L59"><span class="lineNum">      59</span>              :         char upath[128];</span>
+<span id="L60"><span class="lineNum">      60</span>              :         FILE *res;</span>
+<span id="L61"><span class="lineNum">      61</span>              : </span>
+<span id="L62"><span class="lineNum">      62</span> <span class="tlaGNC">           8 :         if (updates)</span></span>
+<span id="L63"><span class="lineNum">      63</span>              :                 {</span>
+<span id="L64"><span class="lineNum">      64</span> <span class="tlaUNC">           0 :                 if (update &gt; 0) /* updates */</span></span>
+<span id="L65"><span class="lineNum">      65</span> <span class="tlaUNC">           0 :                         if ( insert_segments )</span></span>
+<span id="L66"><span class="lineNum">      66</span>              :                                 {</span>
+<span id="L67"><span class="lineNum">      67</span>              :                                 int this_segment;</span>
+<span id="L68"><span class="lineNum">      68</span> <span class="tlaUNC">           0 :                                 if(strcmp(tdefs[table].name,&quot;orders.tbl&quot;))</span></span>
+<span id="L69"><span class="lineNum">      69</span> <span class="tlaUNC">           0 :                                         this_segment=++insert_orders_segment;</span></span>
+<span id="L70"><span class="lineNum">      70</span>              :                                 else </span>
+<span id="L71"><span class="lineNum">      71</span> <span class="tlaUNC">           0 :                                         this_segment=++insert_lineitem_segment;</span></span>
+<span id="L72"><span class="lineNum">      72</span> <span class="tlaUNC">           0 :                                 sprintf(upath, &quot;%s%c%s.u%d.%d&quot;, </span></span>
+<span id="L73"><span class="lineNum">      73</span>              :                                         env_config(PATH_TAG, PATH_DFLT),</span>
+<span id="L74"><span class="lineNum">      74</span>              :                                         PATH_SEP, tdefs[table].name, update%10000,this_segment);</span>
+<span id="L75"><span class="lineNum">      75</span> <span class="tlaUNC">           0 :                                 }</span></span>
+<span id="L76"><span class="lineNum">      76</span>              :                         else</span>
+<span id="L77"><span class="lineNum">      77</span>              :                                 {</span>
+<span id="L78"><span class="lineNum">      78</span> <span class="tlaUNC">           0 :                                 sprintf(upath, &quot;%s%c%s.u%d&quot;,</span></span>
+<span id="L79"><span class="lineNum">      79</span>              :                                 env_config(PATH_TAG, PATH_DFLT),</span>
+<span id="L80"><span class="lineNum">      80</span>              :                                 PATH_SEP, tdefs[table].name, update);</span>
+<span id="L81"><span class="lineNum">      81</span>              :                                 }</span>
+<span id="L82"><span class="lineNum">      82</span>              :                 else /* deletes */</span>
+<span id="L83"><span class="lineNum">      83</span> <span class="tlaUNC">           0 :                         if ( delete_segments )</span></span>
+<span id="L84"><span class="lineNum">      84</span>              :                                 {</span>
+<span id="L85"><span class="lineNum">      85</span> <span class="tlaUNC">           0 :                                 ++delete_segment;</span></span>
+<span id="L86"><span class="lineNum">      86</span> <span class="tlaUNC">           0 :                                 sprintf(upath, &quot;%s%cdelete.u%d.%d&quot;,</span></span>
+<span id="L87"><span class="lineNum">      87</span>              :                                         env_config(PATH_TAG, PATH_DFLT), PATH_SEP, -update%10000,</span>
+<span id="L88"><span class="lineNum">      88</span>              :                                         delete_segment);</span>
+<span id="L89"><span class="lineNum">      89</span> <span class="tlaUNC">           0 :                                 }</span></span>
+<span id="L90"><span class="lineNum">      90</span>              :                         else</span>
+<span id="L91"><span class="lineNum">      91</span>              :                                 {</span>
+<span id="L92"><span class="lineNum">      92</span> <span class="tlaUNC">           0 :                                 sprintf(upath, &quot;%s%cdelete.%d&quot;,</span></span>
+<span id="L93"><span class="lineNum">      93</span>              :                                 env_config(PATH_TAG, PATH_DFLT), PATH_SEP, -update);</span>
+<span id="L94"><span class="lineNum">      94</span>              :                                 }</span>
+<span id="L95"><span class="lineNum">      95</span> <span class="tlaUNC">           0 :                 return(fopen(upath, &quot;w&quot;));</span></span>
+<span id="L96"><span class="lineNum">      96</span>              :         }</span>
+<span id="L97"><span class="lineNum">      97</span>              :     </span>
+<span id="L98"><span class="lineNum">      98</span> <span class="tlaGNC">           8 :         if (zstdout) </span></span>
+<span id="L99"><span class="lineNum">      99</span>              :         {</span>
+<span id="L100"><span class="lineNum">     100</span> <span class="tlaUNC">           0 :                 return(stdout);</span></span>
+<span id="L101"><span class="lineNum">     101</span>              :         }</span>
+<span id="L102"><span class="lineNum">     102</span>              :         else</span>
+<span id="L103"><span class="lineNum">     103</span>              :         {</span>
+<span id="L104"><span class="lineNum">     104</span> <span class="tlaGNC">           8 :                 res = tbl_open(table, &quot;w&quot;);</span></span>
+<span id="L105"><span class="lineNum">     105</span> <span class="tlaGNC">           8 :                 OPEN_CHECK(res, tdefs[table].name);</span></span>
+<span id="L106"><span class="lineNum">     106</span> <span class="tlaGNC">           8 :                 return(res);</span></span>
+<span id="L107"><span class="lineNum">     107</span>              :         }</span>
+<span id="L108"><span class="lineNum">     108</span> <span class="tlaGNC">           8 : }</span></span>
+<span id="L109"><span class="lineNum">     109</span>              : </span>
+<span id="L110"><span class="lineNum">     110</span>              : int</span>
+<span id="L111"><span class="lineNum">     111</span> <span class="tlaGNC">    11666267 : dbg_print(int format, FILE *target, void *data, int len, int sep)</span></span>
+<span id="L112"><span class="lineNum">     112</span>              : {</span>
+<span id="L113"><span class="lineNum">     113</span>              :         int dollars,</span>
+<span id="L114"><span class="lineNum">     114</span>              :                 cents;</span>
+<span id="L115"><span class="lineNum">     115</span>              : </span>
+<span id="L116"><span class="lineNum">     116</span> <span class="tlaGNC">    11666267 :         switch(format)</span></span>
+<span id="L117"><span class="lineNum">     117</span>              :         {</span>
+<span id="L118"><span class="lineNum">     118</span>              :         case DT_STR:</span>
+<span id="L119"><span class="lineNum">     119</span> <span class="tlaGNC">     4482492 :                 fprintf(target, &quot;%s&quot;, (char *)data);</span></span>
+<span id="L120"><span class="lineNum">     120</span> <span class="tlaGNC">     4482492 :                 break;</span></span>
+<span id="L121"><span class="lineNum">     121</span>              : #ifdef MVS</span>
+<span id="L122"><span class="lineNum">     122</span>              :         case DT_VSTR:</span>
+<span id="L123"><span class="lineNum">     123</span>              :                 /* note: only used in MVS, assumes columnar output */</span>
+<span id="L124"><span class="lineNum">     124</span>              :                 fprintf(target, &quot;%c%c%-*s&quot;, </span>
+<span id="L125"><span class="lineNum">     125</span>              :                         (len &gt;&gt; 8) &amp; 0xFF, len &amp; 0xFF, len, (char *)data);</span>
+<span id="L126"><span class="lineNum">     126</span>              :                 break;</span>
+<span id="L127"><span class="lineNum">     127</span>              : #endif /* MVS */</span>
+<span id="L128"><span class="lineNum">     128</span>              :         case DT_INT:</span>
+<span id="L129"><span class="lineNum">     129</span> <span class="tlaGNC">      150025 :                 fprintf(target, &quot;%ld&quot;, (long)data);</span></span>
+<span id="L130"><span class="lineNum">     130</span> <span class="tlaGNC">      150025 :                 break;</span></span>
+<span id="L131"><span class="lineNum">     131</span>              :         case DT_HUGE:</span>
+<span id="L132"><span class="lineNum">     132</span> <span class="tlaGNC">     3614890 :                 fprintf(target, HUGE_FORMAT, *(DSS_HUGE *)data);</span></span>
+<span id="L133"><span class="lineNum">     133</span> <span class="tlaGNC">     3614890 :                 break;</span></span>
+<span id="L134"><span class="lineNum">     134</span>              :         case DT_KEY:</span>
+<span id="L135"><span class="lineNum">     135</span> <span class="tlaUNC">           0 :                 fprintf(target, &quot;%ld&quot;, (long)data);</span></span>
+<span id="L136"><span class="lineNum">     136</span> <span class="tlaUNC">           0 :                 break;</span></span>
+<span id="L137"><span class="lineNum">     137</span>              :         case DT_MONEY:</span>
+<span id="L138"><span class="lineNum">     138</span> <span class="tlaGNC">     2067716 :                 cents = (int)*(DSS_HUGE *)data;</span></span>
+<span id="L139"><span class="lineNum">     139</span> <span class="tlaGNC">     2067716 :                 if (cents &lt; 0)</span></span>
+<span id="L140"><span class="lineNum">     140</span>              :                         {</span>
+<span id="L141"><span class="lineNum">     141</span> <span class="tlaGNC">        1492 :                         fprintf(target, &quot;-&quot;);</span></span>
+<span id="L142"><span class="lineNum">     142</span> <span class="tlaGNC">        1492 :                         cents = -cents;</span></span>
+<span id="L143"><span class="lineNum">     143</span> <span class="tlaGNC">        1492 :                         }</span></span>
+<span id="L144"><span class="lineNum">     144</span> <span class="tlaGNC">     2067716 :                 dollars = cents / 100;</span></span>
+<span id="L145"><span class="lineNum">     145</span> <span class="tlaGNC">     2067716 :                 cents %= 100;</span></span>
+<span id="L146"><span class="lineNum">     146</span> <span class="tlaGNC">     2067716 :                 fprintf(target, &quot;%d.%02d&quot;, dollars, cents);</span></span>
+<span id="L147"><span class="lineNum">     147</span> <span class="tlaGNC">     2067716 :                 break;</span></span>
+<span id="L148"><span class="lineNum">     148</span>              :         case DT_CHR:</span>
+<span id="L149"><span class="lineNum">     149</span> <span class="tlaGNC">     1351144 :                 fprintf(target, &quot;%c&quot;, *(char *)data);</span></span>
+<span id="L150"><span class="lineNum">     150</span> <span class="tlaGNC">     1351144 :                 break;</span></span>
+<span id="L151"><span class="lineNum">     151</span>              :         }</span>
+<span id="L152"><span class="lineNum">     152</span>              : </span>
+<span id="L153"><span class="lineNum">     153</span>              : #ifdef EOL_HANDLING</span>
+<span id="L154"><span class="lineNum">     154</span>              :         if (sep)</span>
+<span id="L155"><span class="lineNum">     155</span>              : #endif /* EOL_HANDLING */</span>
+<span id="L156"><span class="lineNum">     156</span> <span class="tlaGNC">    11666267 :         fprintf(target, &quot;%c&quot;, SEPARATOR);</span></span>
+<span id="L157"><span class="lineNum">     157</span>              :         </span>
+<span id="L158"><span class="lineNum">     158</span> <span class="tlaGNC">    11666267 :         return(0);</span></span>
+<span id="L159"><span class="lineNum">     159</span>              : }</span>
+<span id="L160"><span class="lineNum">     160</span>              : </span>
+<span id="L161"><span class="lineNum">     161</span>              : int</span>
+<span id="L162"><span class="lineNum">     162</span> <span class="tlaGNC">       15000 : pr_cust(customer_t *c, int mode)</span></span>
+<span id="L163"><span class="lineNum">     163</span>              : {</span>
+<span id="L164"><span class="lineNum">     164</span>              : static FILE *fp = NULL;</span>
+<span id="L165"><span class="lineNum">     165</span>              :         </span>
+<span id="L166"><span class="lineNum">     166</span> <span class="tlaGNC">       15000 :    if (fp == NULL)</span></span>
+<span id="L167"><span class="lineNum">     167</span> <span class="tlaGNC">           1 :         fp = print_prep(CUST, 0);</span></span>
+<span id="L168"><span class="lineNum">     168</span>              : </span>
+<span id="L169"><span class="lineNum">     169</span>              :    PR_STRT(fp);</span>
+<span id="L170"><span class="lineNum">     170</span> <span class="tlaGNC">       15000 :    PR_HUGE(fp, &amp;c-&gt;custkey);</span></span>
+<span id="L171"><span class="lineNum">     171</span> <span class="tlaGNC">       15000 :    if (scale &lt;= 3000)</span></span>
+<span id="L172"><span class="lineNum">     172</span> <span class="tlaGNC">       15000 :    PR_VSTR(fp, c-&gt;name, C_NAME_LEN);</span></span>
+<span id="L173"><span class="lineNum">     173</span>              :    else</span>
+<span id="L174"><span class="lineNum">     174</span> <span class="tlaUNC">           0 :    PR_VSTR(fp, c-&gt;name, C_NAME_LEN + 3);</span></span>
+<span id="L175"><span class="lineNum">     175</span> <span class="tlaGNC">       15000 :    PR_VSTR(fp, c-&gt;address, c-&gt;alen);</span></span>
+<span id="L176"><span class="lineNum">     176</span> <span class="tlaGNC">       15000 :    PR_HUGE(fp, &amp;c-&gt;nation_code);</span></span>
+<span id="L177"><span class="lineNum">     177</span> <span class="tlaGNC">       15000 :    PR_STR(fp, c-&gt;phone, PHONE_LEN);</span></span>
+<span id="L178"><span class="lineNum">     178</span> <span class="tlaGNC">       15000 :    PR_MONEY(fp, &amp;c-&gt;acctbal);</span></span>
+<span id="L179"><span class="lineNum">     179</span> <span class="tlaGNC">       15000 :    PR_STR(fp, c-&gt;mktsegment, C_MSEG_LEN);</span></span>
+<span id="L180"><span class="lineNum">     180</span> <span class="tlaGNC">       15000 :    PR_VSTR_LAST(fp, c-&gt;comment, c-&gt;clen);</span></span>
+<span id="L181"><span class="lineNum">     181</span> <span class="tlaGNC">       15000 :    PR_END(fp);</span></span>
+<span id="L182"><span class="lineNum">     182</span>              : </span>
+<span id="L183"><span class="lineNum">     183</span> <span class="tlaGNC">       15000 :    return(0);</span></span>
+<span id="L184"><span class="lineNum">     184</span>              : }</span>
+<span id="L185"><span class="lineNum">     185</span>              : </span>
+<span id="L186"><span class="lineNum">     186</span>              : /*</span>
+<span id="L187"><span class="lineNum">     187</span>              :  * print the numbered order </span>
+<span id="L188"><span class="lineNum">     188</span>              :  */</span>
+<span id="L189"><span class="lineNum">     189</span>              : int</span>
+<span id="L190"><span class="lineNum">     190</span> <span class="tlaGNC">      150000 : pr_order(order_t *o, int mode)</span></span>
+<span id="L191"><span class="lineNum">     191</span>              : {</span>
+<span id="L192"><span class="lineNum">     192</span>              :     static FILE *fp_o = NULL;</span>
+<span id="L193"><span class="lineNum">     193</span>              :     static int last_mode = 0;</span>
+<span id="L194"><span class="lineNum">     194</span>              :         </span>
+<span id="L195"><span class="lineNum">     195</span> <span class="tlaGNC">      150000 :     if (fp_o == NULL || mode != last_mode)</span></span>
+<span id="L196"><span class="lineNum">     196</span>              :         {</span>
+<span id="L197"><span class="lineNum">     197</span> <span class="tlaGNC">           1 :         if (fp_o) </span></span>
+<span id="L198"><span class="lineNum">     198</span> <span class="tlaUNC">           0 :             fclose(fp_o);</span></span>
+<span id="L199"><span class="lineNum">     199</span> <span class="tlaGNC">           1 :         fp_o = print_prep(ORDER, mode);</span></span>
+<span id="L200"><span class="lineNum">     200</span> <span class="tlaGNC">           1 :         last_mode = mode;</span></span>
+<span id="L201"><span class="lineNum">     201</span> <span class="tlaGNC">           1 :         }</span></span>
+<span id="L202"><span class="lineNum">     202</span>              :     PR_STRT(fp_o);</span>
+<span id="L203"><span class="lineNum">     203</span> <span class="tlaGNC">      150000 :     PR_HUGE(fp_o, &amp;o-&gt;okey);</span></span>
+<span id="L204"><span class="lineNum">     204</span> <span class="tlaGNC">      150000 :     PR_HUGE(fp_o, &amp;o-&gt;custkey);</span></span>
+<span id="L205"><span class="lineNum">     205</span> <span class="tlaGNC">      150000 :     PR_CHR(fp_o, &amp;o-&gt;orderstatus);</span></span>
+<span id="L206"><span class="lineNum">     206</span> <span class="tlaGNC">      150000 :     PR_MONEY(fp_o, &amp;o-&gt;totalprice);</span></span>
+<span id="L207"><span class="lineNum">     207</span> <span class="tlaGNC">      150000 :     PR_STR(fp_o, o-&gt;odate, DATE_LEN);</span></span>
+<span id="L208"><span class="lineNum">     208</span> <span class="tlaGNC">      150000 :     PR_STR(fp_o, o-&gt;opriority, O_OPRIO_LEN);</span></span>
+<span id="L209"><span class="lineNum">     209</span> <span class="tlaGNC">      150000 :     PR_STR(fp_o, o-&gt;clerk, O_CLRK_LEN);</span></span>
+<span id="L210"><span class="lineNum">     210</span> <span class="tlaGNC">      150000 :     PR_INT(fp_o, o-&gt;spriority);</span></span>
+<span id="L211"><span class="lineNum">     211</span> <span class="tlaGNC">      150000 :     PR_VSTR_LAST(fp_o, o-&gt;comment, o-&gt;clen);</span></span>
+<span id="L212"><span class="lineNum">     212</span> <span class="tlaGNC">      150000 :     PR_END(fp_o);</span></span>
+<span id="L213"><span class="lineNum">     213</span>              : </span>
+<span id="L214"><span class="lineNum">     214</span> <span class="tlaGNC">      150000 :     return(0);</span></span>
+<span id="L215"><span class="lineNum">     215</span>              : }</span>
+<span id="L216"><span class="lineNum">     216</span>              : </span>
+<span id="L217"><span class="lineNum">     217</span>              : /*</span>
+<span id="L218"><span class="lineNum">     218</span>              :  * print an order's lineitems</span>
+<span id="L219"><span class="lineNum">     219</span>              :  */</span>
+<span id="L220"><span class="lineNum">     220</span>              : int</span>
+<span id="L221"><span class="lineNum">     221</span> <span class="tlaGNC">      150000 : pr_line(order_t *o, int mode)</span></span>
+<span id="L222"><span class="lineNum">     222</span>              : {</span>
+<span id="L223"><span class="lineNum">     223</span>              :     static FILE *fp_l = NULL;</span>
+<span id="L224"><span class="lineNum">     224</span>              :     static int last_mode = 0;</span>
+<span id="L225"><span class="lineNum">     225</span>              :     long      i;</span>
+<span id="L226"><span class="lineNum">     226</span>              :         </span>
+<span id="L227"><span class="lineNum">     227</span> <span class="tlaGNC">      150000 :     if (fp_l == NULL || mode != last_mode)</span></span>
+<span id="L228"><span class="lineNum">     228</span>              :         {</span>
+<span id="L229"><span class="lineNum">     229</span> <span class="tlaGNC">           1 :         if (fp_l) </span></span>
+<span id="L230"><span class="lineNum">     230</span> <span class="tlaUNC">           0 :             fclose(fp_l);</span></span>
+<span id="L231"><span class="lineNum">     231</span> <span class="tlaGNC">           1 :         fp_l = print_prep(LINE, mode);</span></span>
+<span id="L232"><span class="lineNum">     232</span> <span class="tlaGNC">           1 :         last_mode = mode;</span></span>
+<span id="L233"><span class="lineNum">     233</span> <span class="tlaGNC">           1 :         }</span></span>
+<span id="L234"><span class="lineNum">     234</span>              : </span>
+<span id="L235"><span class="lineNum">     235</span> <span class="tlaGNC">      750572 :     for (i = 0; i &lt; o-&gt;lines; i++)</span></span>
+<span id="L236"><span class="lineNum">     236</span>              :         {</span>
+<span id="L237"><span class="lineNum">     237</span>              :         PR_STRT(fp_l);</span>
+<span id="L238"><span class="lineNum">     238</span> <span class="tlaGNC">      600572 :         PR_HUGE(fp_l, &amp;o-&gt;l[i].okey);</span></span>
+<span id="L239"><span class="lineNum">     239</span> <span class="tlaGNC">      600572 :         PR_HUGE(fp_l, &amp;o-&gt;l[i].partkey);</span></span>
+<span id="L240"><span class="lineNum">     240</span> <span class="tlaGNC">      600572 :         PR_HUGE(fp_l, &amp;o-&gt;l[i].suppkey);</span></span>
+<span id="L241"><span class="lineNum">     241</span> <span class="tlaGNC">      600572 :         PR_HUGE(fp_l, &amp;o-&gt;l[i].lcnt);</span></span>
+<span id="L242"><span class="lineNum">     242</span> <span class="tlaGNC">      600572 :         PR_HUGE(fp_l, &amp;o-&gt;l[i].quantity);</span></span>
+<span id="L243"><span class="lineNum">     243</span> <span class="tlaGNC">      600572 :         PR_MONEY(fp_l, &amp;o-&gt;l[i].eprice);</span></span>
+<span id="L244"><span class="lineNum">     244</span> <span class="tlaGNC">      600572 :         PR_MONEY(fp_l, &amp;o-&gt;l[i].discount);</span></span>
+<span id="L245"><span class="lineNum">     245</span> <span class="tlaGNC">      600572 :         PR_MONEY(fp_l, &amp;o-&gt;l[i].tax);</span></span>
+<span id="L246"><span class="lineNum">     246</span> <span class="tlaGNC">      600572 :         PR_CHR(fp_l, &amp;o-&gt;l[i].rflag[0]);</span></span>
+<span id="L247"><span class="lineNum">     247</span> <span class="tlaGNC">      600572 :         PR_CHR(fp_l, &amp;o-&gt;l[i].lstatus[0]);</span></span>
+<span id="L248"><span class="lineNum">     248</span> <span class="tlaGNC">      600572 :         PR_STR(fp_l, o-&gt;l[i].sdate, DATE_LEN);</span></span>
+<span id="L249"><span class="lineNum">     249</span> <span class="tlaGNC">      600572 :         PR_STR(fp_l, o-&gt;l[i].cdate, DATE_LEN);</span></span>
+<span id="L250"><span class="lineNum">     250</span> <span class="tlaGNC">      600572 :         PR_STR(fp_l, o-&gt;l[i].rdate, DATE_LEN);</span></span>
+<span id="L251"><span class="lineNum">     251</span> <span class="tlaGNC">      600572 :         PR_STR(fp_l, o-&gt;l[i].shipinstruct, L_INST_LEN);</span></span>
+<span id="L252"><span class="lineNum">     252</span> <span class="tlaGNC">      600572 :         PR_STR(fp_l, o-&gt;l[i].shipmode, L_SMODE_LEN);</span></span>
+<span id="L253"><span class="lineNum">     253</span> <span class="tlaGNC">      600572 :         PR_VSTR_LAST(fp_l, o-&gt;l[i].comment,o-&gt;l[i].clen);</span></span>
+<span id="L254"><span class="lineNum">     254</span> <span class="tlaGNC">      600572 :         PR_END(fp_l);</span></span>
+<span id="L255"><span class="lineNum">     255</span> <span class="tlaGNC">      600572 :         }</span></span>
+<span id="L256"><span class="lineNum">     256</span>              : </span>
+<span id="L257"><span class="lineNum">     257</span> <span class="tlaGNC">      150000 :    return(0);</span></span>
+<span id="L258"><span class="lineNum">     258</span>              : }</span>
+<span id="L259"><span class="lineNum">     259</span>              : </span>
+<span id="L260"><span class="lineNum">     260</span>              : /*</span>
+<span id="L261"><span class="lineNum">     261</span>              :  * print the numbered order *and* its associated lineitems</span>
+<span id="L262"><span class="lineNum">     262</span>              :  */</span>
+<span id="L263"><span class="lineNum">     263</span>              : int</span>
+<span id="L264"><span class="lineNum">     264</span> <span class="tlaGNC">      150000 : pr_order_line(order_t *o, int mode)</span></span>
+<span id="L265"><span class="lineNum">     265</span>              : {</span>
+<span id="L266"><span class="lineNum">     266</span> <span class="tlaGNC">      150000 :     tdefs[ORDER].name = tdefs[ORDER_LINE].name;</span></span>
+<span id="L267"><span class="lineNum">     267</span> <span class="tlaGNC">      150000 :     pr_order(o, mode);</span></span>
+<span id="L268"><span class="lineNum">     268</span> <span class="tlaGNC">      150000 :     pr_line(o, mode);</span></span>
+<span id="L269"><span class="lineNum">     269</span>              : </span>
+<span id="L270"><span class="lineNum">     270</span> <span class="tlaGNC">      150000 :     return(0);</span></span>
+<span id="L271"><span class="lineNum">     271</span>              : }</span>
+<span id="L272"><span class="lineNum">     272</span>              : </span>
+<span id="L273"><span class="lineNum">     273</span>              : /*</span>
+<span id="L274"><span class="lineNum">     274</span>              :  * print the given part</span>
+<span id="L275"><span class="lineNum">     275</span>              :  */</span>
+<span id="L276"><span class="lineNum">     276</span>              : int</span>
+<span id="L277"><span class="lineNum">     277</span> <span class="tlaGNC">       20000 : pr_part(part_t *part, int mode)</span></span>
+<span id="L278"><span class="lineNum">     278</span>              : {</span>
+<span id="L279"><span class="lineNum">     279</span>              : static FILE *p_fp = NULL;</span>
+<span id="L280"><span class="lineNum">     280</span>              : </span>
+<span id="L281"><span class="lineNum">     281</span> <span class="tlaGNC">       20000 :     if (p_fp == NULL)</span></span>
+<span id="L282"><span class="lineNum">     282</span> <span class="tlaGNC">           1 :         p_fp = print_prep(PART, 0);</span></span>
+<span id="L283"><span class="lineNum">     283</span>              : </span>
+<span id="L284"><span class="lineNum">     284</span>              :    PR_STRT(p_fp);</span>
+<span id="L285"><span class="lineNum">     285</span> <span class="tlaGNC">       20000 :    PR_HUGE(p_fp, &amp;part-&gt;partkey);</span></span>
+<span id="L286"><span class="lineNum">     286</span> <span class="tlaGNC">       20000 :    PR_VSTR(p_fp, part-&gt;name,part-&gt;nlen);</span></span>
+<span id="L287"><span class="lineNum">     287</span> <span class="tlaGNC">       20000 :    PR_STR(p_fp, part-&gt;mfgr, P_MFG_LEN);</span></span>
+<span id="L288"><span class="lineNum">     288</span> <span class="tlaGNC">       20000 :    PR_STR(p_fp, part-&gt;brand, P_BRND_LEN);</span></span>
+<span id="L289"><span class="lineNum">     289</span> <span class="tlaGNC">       20000 :    PR_VSTR(p_fp, part-&gt;type,part-&gt;tlen);</span></span>
+<span id="L290"><span class="lineNum">     290</span> <span class="tlaGNC">       20000 :    PR_HUGE(p_fp, &amp;part-&gt;size);</span></span>
+<span id="L291"><span class="lineNum">     291</span> <span class="tlaGNC">       20000 :    PR_STR(p_fp, part-&gt;container, P_CNTR_LEN);</span></span>
+<span id="L292"><span class="lineNum">     292</span> <span class="tlaGNC">       20000 :    PR_MONEY(p_fp, &amp;part-&gt;retailprice);</span></span>
+<span id="L293"><span class="lineNum">     293</span> <span class="tlaGNC">       20000 :    PR_VSTR_LAST(p_fp, part-&gt;comment,part-&gt;clen);</span></span>
+<span id="L294"><span class="lineNum">     294</span> <span class="tlaGNC">       20000 :    PR_END(p_fp);</span></span>
+<span id="L295"><span class="lineNum">     295</span>              : </span>
+<span id="L296"><span class="lineNum">     296</span> <span class="tlaGNC">       20000 :    return(0);</span></span>
+<span id="L297"><span class="lineNum">     297</span>              : }</span>
+<span id="L298"><span class="lineNum">     298</span>              : </span>
+<span id="L299"><span class="lineNum">     299</span>              : /*</span>
+<span id="L300"><span class="lineNum">     300</span>              :  * print the given part's suppliers</span>
+<span id="L301"><span class="lineNum">     301</span>              :  */</span>
+<span id="L302"><span class="lineNum">     302</span>              : int</span>
+<span id="L303"><span class="lineNum">     303</span> <span class="tlaGNC">       20000 : pr_psupp(part_t *part, int mode)</span></span>
+<span id="L304"><span class="lineNum">     304</span>              : {</span>
+<span id="L305"><span class="lineNum">     305</span>              :     static FILE *ps_fp = NULL;</span>
+<span id="L306"><span class="lineNum">     306</span>              :     long      i;</span>
+<span id="L307"><span class="lineNum">     307</span>              : </span>
+<span id="L308"><span class="lineNum">     308</span> <span class="tlaGNC">       20000 :     if (ps_fp == NULL)</span></span>
+<span id="L309"><span class="lineNum">     309</span> <span class="tlaGNC">           1 :         ps_fp = print_prep(PSUPP, mode);</span></span>
+<span id="L310"><span class="lineNum">     310</span>              : </span>
+<span id="L311"><span class="lineNum">     311</span> <span class="tlaGNC">      100000 :    for (i = 0; i &lt; SUPP_PER_PART; i++)</span></span>
+<span id="L312"><span class="lineNum">     312</span>              :       {</span>
+<span id="L313"><span class="lineNum">     313</span>              :       PR_STRT(ps_fp);</span>
+<span id="L314"><span class="lineNum">     314</span> <span class="tlaGNC">       80000 :       PR_HUGE(ps_fp, &amp;part-&gt;s[i].partkey);</span></span>
+<span id="L315"><span class="lineNum">     315</span> <span class="tlaGNC">       80000 :       PR_HUGE(ps_fp, &amp;part-&gt;s[i].suppkey);</span></span>
+<span id="L316"><span class="lineNum">     316</span> <span class="tlaGNC">       80000 :       PR_HUGE(ps_fp, &amp;part-&gt;s[i].qty);</span></span>
+<span id="L317"><span class="lineNum">     317</span> <span class="tlaGNC">       80000 :       PR_MONEY(ps_fp, &amp;part-&gt;s[i].scost);</span></span>
+<span id="L318"><span class="lineNum">     318</span> <span class="tlaGNC">       80000 :       PR_VSTR_LAST(ps_fp, part-&gt;s[i].comment,part-&gt;s[i].clen);</span></span>
+<span id="L319"><span class="lineNum">     319</span> <span class="tlaGNC">       80000 :       PR_END(ps_fp);</span></span>
+<span id="L320"><span class="lineNum">     320</span> <span class="tlaGNC">       80000 :       }</span></span>
+<span id="L321"><span class="lineNum">     321</span>              : </span>
+<span id="L322"><span class="lineNum">     322</span> <span class="tlaGNC">       20000 :    return(0);</span></span>
+<span id="L323"><span class="lineNum">     323</span>              : }</span>
+<span id="L324"><span class="lineNum">     324</span>              : </span>
+<span id="L325"><span class="lineNum">     325</span>              : /*</span>
+<span id="L326"><span class="lineNum">     326</span>              :  * print the given part *and* its suppliers</span>
+<span id="L327"><span class="lineNum">     327</span>              :  */</span>
+<span id="L328"><span class="lineNum">     328</span>              : int</span>
+<span id="L329"><span class="lineNum">     329</span> <span class="tlaGNC">       20000 : pr_part_psupp(part_t *part, int mode)</span></span>
+<span id="L330"><span class="lineNum">     330</span>              : {</span>
+<span id="L331"><span class="lineNum">     331</span> <span class="tlaGNC">       20000 :     tdefs[PART].name = tdefs[PART_PSUPP].name;</span></span>
+<span id="L332"><span class="lineNum">     332</span> <span class="tlaGNC">       20000 :     pr_part(part, mode);</span></span>
+<span id="L333"><span class="lineNum">     333</span> <span class="tlaGNC">       20000 :     pr_psupp(part, mode);</span></span>
+<span id="L334"><span class="lineNum">     334</span>              : </span>
+<span id="L335"><span class="lineNum">     335</span> <span class="tlaGNC">       20000 :     return(0);</span></span>
+<span id="L336"><span class="lineNum">     336</span>              : }</span>
+<span id="L337"><span class="lineNum">     337</span>              : </span>
+<span id="L338"><span class="lineNum">     338</span>              : int</span>
+<span id="L339"><span class="lineNum">     339</span> <span class="tlaGNC">        1000 : pr_supp(supplier_t *supp, int mode)</span></span>
+<span id="L340"><span class="lineNum">     340</span>              : {</span>
+<span id="L341"><span class="lineNum">     341</span>              : static FILE *fp = NULL;</span>
+<span id="L342"><span class="lineNum">     342</span>              :         </span>
+<span id="L343"><span class="lineNum">     343</span> <span class="tlaGNC">        1000 :    if (fp == NULL)</span></span>
+<span id="L344"><span class="lineNum">     344</span> <span class="tlaGNC">           1 :         fp = print_prep(SUPP, mode);</span></span>
+<span id="L345"><span class="lineNum">     345</span>              : </span>
+<span id="L346"><span class="lineNum">     346</span>              :    PR_STRT(fp);</span>
+<span id="L347"><span class="lineNum">     347</span> <span class="tlaGNC">        1000 :    PR_HUGE(fp, &amp;supp-&gt;suppkey);</span></span>
+<span id="L348"><span class="lineNum">     348</span> <span class="tlaGNC">        1000 :    PR_STR(fp, supp-&gt;name, S_NAME_LEN);</span></span>
+<span id="L349"><span class="lineNum">     349</span> <span class="tlaGNC">        1000 :    PR_VSTR(fp, supp-&gt;address, supp-&gt;alen);</span></span>
+<span id="L350"><span class="lineNum">     350</span> <span class="tlaGNC">        1000 :    PR_HUGE(fp, &amp;supp-&gt;nation_code);</span></span>
+<span id="L351"><span class="lineNum">     351</span> <span class="tlaGNC">        1000 :    PR_STR(fp, supp-&gt;phone, PHONE_LEN);</span></span>
+<span id="L352"><span class="lineNum">     352</span> <span class="tlaGNC">        1000 :    PR_MONEY(fp, &amp;supp-&gt;acctbal);</span></span>
+<span id="L353"><span class="lineNum">     353</span> <span class="tlaGNC">        1000 :    PR_VSTR_LAST(fp, supp-&gt;comment, supp-&gt;clen);</span></span>
+<span id="L354"><span class="lineNum">     354</span> <span class="tlaGNC">        1000 :    PR_END(fp);</span></span>
+<span id="L355"><span class="lineNum">     355</span>              : </span>
+<span id="L356"><span class="lineNum">     356</span> <span class="tlaGNC">        1000 :    return(0);</span></span>
+<span id="L357"><span class="lineNum">     357</span>              : }</span>
+<span id="L358"><span class="lineNum">     358</span>              : </span>
+<span id="L359"><span class="lineNum">     359</span>              : int</span>
+<span id="L360"><span class="lineNum">     360</span> <span class="tlaGNC">          25 : pr_nation(code_t *c, int mode)</span></span>
+<span id="L361"><span class="lineNum">     361</span>              : {</span>
+<span id="L362"><span class="lineNum">     362</span>              : static FILE *fp = NULL;</span>
+<span id="L363"><span class="lineNum">     363</span>              :         </span>
+<span id="L364"><span class="lineNum">     364</span> <span class="tlaGNC">          25 :    if (fp == NULL)</span></span>
+<span id="L365"><span class="lineNum">     365</span> <span class="tlaGNC">           1 :         fp = print_prep(NATION, mode);</span></span>
+<span id="L366"><span class="lineNum">     366</span>              : </span>
+<span id="L367"><span class="lineNum">     367</span>              :    PR_STRT(fp);</span>
+<span id="L368"><span class="lineNum">     368</span> <span class="tlaGNC">          25 :    PR_HUGE(fp, &amp;c-&gt;code);</span></span>
+<span id="L369"><span class="lineNum">     369</span> <span class="tlaGNC">          25 :    PR_STR(fp, c-&gt;text, NATION_LEN);</span></span>
+<span id="L370"><span class="lineNum">     370</span> <span class="tlaGNC">          25 :    PR_INT(fp, c-&gt;join);</span></span>
+<span id="L371"><span class="lineNum">     371</span> <span class="tlaGNC">          25 :    PR_VSTR_LAST(fp, c-&gt;comment, c-&gt;clen);</span></span>
+<span id="L372"><span class="lineNum">     372</span> <span class="tlaGNC">          25 :    PR_END(fp);</span></span>
+<span id="L373"><span class="lineNum">     373</span>              : </span>
+<span id="L374"><span class="lineNum">     374</span> <span class="tlaGNC">          25 :    return(0);</span></span>
+<span id="L375"><span class="lineNum">     375</span>              : }</span>
+<span id="L376"><span class="lineNum">     376</span>              : </span>
+<span id="L377"><span class="lineNum">     377</span>              : int</span>
+<span id="L378"><span class="lineNum">     378</span> <span class="tlaGNC">           5 : pr_region(code_t *c, int mode)</span></span>
+<span id="L379"><span class="lineNum">     379</span>              : {</span>
+<span id="L380"><span class="lineNum">     380</span>              : static FILE *fp = NULL;</span>
+<span id="L381"><span class="lineNum">     381</span>              :         </span>
+<span id="L382"><span class="lineNum">     382</span> <span class="tlaGNC">           5 :    if (fp == NULL)</span></span>
+<span id="L383"><span class="lineNum">     383</span> <span class="tlaGNC">           1 :         fp = print_prep(REGION, mode);</span></span>
+<span id="L384"><span class="lineNum">     384</span>              : </span>
+<span id="L385"><span class="lineNum">     385</span>              :    PR_STRT(fp);</span>
+<span id="L386"><span class="lineNum">     386</span> <span class="tlaGNC">           5 :    PR_HUGE(fp, &amp;c-&gt;code);</span></span>
+<span id="L387"><span class="lineNum">     387</span> <span class="tlaGNC">           5 :    PR_STR(fp, c-&gt;text, REGION_LEN);</span></span>
+<span id="L388"><span class="lineNum">     388</span> <span class="tlaGNC">           5 :    PR_VSTR_LAST(fp, c-&gt;comment, c-&gt;clen);</span></span>
+<span id="L389"><span class="lineNum">     389</span> <span class="tlaGNC">           5 :    PR_END(fp);</span></span>
+<span id="L390"><span class="lineNum">     390</span>              : </span>
+<span id="L391"><span class="lineNum">     391</span> <span class="tlaGNC">           5 :    return(0);</span></span>
+<span id="L392"><span class="lineNum">     392</span>              : }</span>
+<span id="L393"><span class="lineNum">     393</span>              : </span>
+<span id="L394"><span class="lineNum">     394</span>              : /* </span>
+<span id="L395"><span class="lineNum">     395</span>              :  * NOTE: this routine does NOT use the BCD2_* routines. As a result,</span>
+<span id="L396"><span class="lineNum">     396</span>              :  * it WILL fail if the keys being deleted exceed 32 bits. Since this</span>
+<span id="L397"><span class="lineNum">     397</span>              :  * would require ~660 update iterations, this seems an acceptable</span>
+<span id="L398"><span class="lineNum">     398</span>              :  * oversight</span>
+<span id="L399"><span class="lineNum">     399</span>              :  */</span>
+<span id="L400"><span class="lineNum">     400</span>              : int</span>
+<span id="L401"><span class="lineNum">     401</span> <span class="tlaUNC">           0 : pr_drange(int tbl, DSS_HUGE min, DSS_HUGE cnt, long num)</span></span>
+<span id="L402"><span class="lineNum">     402</span>              : {</span>
+<span id="L403"><span class="lineNum">     403</span>              :     static int  last_num = 0;</span>
+<span id="L404"><span class="lineNum">     404</span>              :     static FILE *dfp = NULL;</span>
+<span id="L405"><span class="lineNum">     405</span> <span class="tlaUNC">           0 :     DSS_HUGE child = -1;</span></span>
+<span id="L406"><span class="lineNum">     406</span>              :     DSS_HUGE start, last, new;</span>
+<span id="L407"><span class="lineNum">     407</span>              : </span>
+<span id="L408"><span class="lineNum">     408</span>              :         static DSS_HUGE rows_per_segment=0;</span>
+<span id="L409"><span class="lineNum">     409</span>              :         static DSS_HUGE rows_this_segment=0;</span>
+<span id="L410"><span class="lineNum">     410</span>              : </span>
+<span id="L411"><span class="lineNum">     411</span> <span class="tlaUNC">           0 :     if (last_num != num)</span></span>
+<span id="L412"><span class="lineNum">     412</span>              :         {</span>
+<span id="L413"><span class="lineNum">     413</span> <span class="tlaUNC">           0 :         if (dfp)</span></span>
+<span id="L414"><span class="lineNum">     414</span> <span class="tlaUNC">           0 :             fclose(dfp);</span></span>
+<span id="L415"><span class="lineNum">     415</span> <span class="tlaUNC">           0 :         dfp = print_prep(tbl, -num);</span></span>
+<span id="L416"><span class="lineNum">     416</span> <span class="tlaUNC">           0 :         if (dfp == NULL)</span></span>
+<span id="L417"><span class="lineNum">     417</span> <span class="tlaUNC">           0 :             return(-1);</span></span>
+<span id="L418"><span class="lineNum">     418</span> <span class="tlaUNC">           0 :         last_num = num;</span></span>
+<span id="L419"><span class="lineNum">     419</span> <span class="tlaUNC">           0 :                 rows_this_segment=0;</span></span>
+<span id="L420"><span class="lineNum">     420</span> <span class="tlaUNC">           0 :         }</span></span>
+<span id="L421"><span class="lineNum">     421</span>              : </span>
+<span id="L422"><span class="lineNum">     422</span> <span class="tlaUNC">           0 :     start = MK_SPARSE(min, num/ (10000 / UPD_PCT));</span></span>
+<span id="L423"><span class="lineNum">     423</span> <span class="tlaUNC">           0 :     last = start - 1;</span></span>
+<span id="L424"><span class="lineNum">     424</span> <span class="tlaUNC">           0 :     for (child=min; cnt &gt; 0; child++, cnt--)</span></span>
+<span id="L425"><span class="lineNum">     425</span>              :         {</span>
+<span id="L426"><span class="lineNum">     426</span> <span class="tlaUNC">           0 :                 new = MK_SPARSE(child, num/ (10000 / UPD_PCT));</span></span>
+<span id="L427"><span class="lineNum">     427</span> <span class="tlaUNC">           0 :                 if (delete_segments)</span></span>
+<span id="L428"><span class="lineNum">     428</span>              :                 {</span>
+<span id="L429"><span class="lineNum">     429</span>              : </span>
+<span id="L430"><span class="lineNum">     430</span> <span class="tlaUNC">           0 :                         if(rows_per_segment==0) </span></span>
+<span id="L431"><span class="lineNum">     431</span> <span class="tlaUNC">           0 :                                 rows_per_segment = (cnt / delete_segments) + 1;</span></span>
+<span id="L432"><span class="lineNum">     432</span> <span class="tlaUNC">           0 :                         if((++rows_this_segment) &gt; rows_per_segment)</span></span>
+<span id="L433"><span class="lineNum">     433</span>              :                         {</span>
+<span id="L434"><span class="lineNum">     434</span> <span class="tlaUNC">           0 :                                 fclose(dfp);</span></span>
+<span id="L435"><span class="lineNum">     435</span> <span class="tlaUNC">           0 :                                 dfp = print_prep(tbl, -num);</span></span>
+<span id="L436"><span class="lineNum">     436</span> <span class="tlaUNC">           0 :                                 if (dfp == NULL) return(-1);</span></span>
+<span id="L437"><span class="lineNum">     437</span> <span class="tlaUNC">           0 :                                 last_num = num;</span></span>
+<span id="L438"><span class="lineNum">     438</span> <span class="tlaUNC">           0 :                                 rows_this_segment=1;</span></span>
+<span id="L439"><span class="lineNum">     439</span> <span class="tlaUNC">           0 :                         }</span></span>
+<span id="L440"><span class="lineNum">     440</span> <span class="tlaUNC">           0 :                 }</span></span>
+<span id="L441"><span class="lineNum">     441</span>              :                 PR_STRT(dfp);</span>
+<span id="L442"><span class="lineNum">     442</span> <span class="tlaUNC">           0 :                 PR_HUGE_LAST(dfp, &amp;new);</span></span>
+<span id="L443"><span class="lineNum">     443</span> <span class="tlaUNC">           0 :                 PR_END(dfp);</span></span>
+<span id="L444"><span class="lineNum">     444</span> <span class="tlaUNC">           0 :                 start = new;</span></span>
+<span id="L445"><span class="lineNum">     445</span> <span class="tlaUNC">           0 :                 last = new;</span></span>
+<span id="L446"><span class="lineNum">     446</span> <span class="tlaUNC">           0 :         }</span></span>
+<span id="L447"><span class="lineNum">     447</span>              :     </span>
+<span id="L448"><span class="lineNum">     448</span> <span class="tlaUNC">           0 :     return(0);</span></span>
+<span id="L449"><span class="lineNum">     449</span> <span class="tlaUNC">           0 : }</span></span>
+<span id="L450"><span class="lineNum">     450</span>              : </span>
+<span id="L451"><span class="lineNum">     451</span>              : </span>
+<span id="L452"><span class="lineNum">     452</span>              : </span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.3.1-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
